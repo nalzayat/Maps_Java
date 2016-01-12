@@ -1,0 +1,26 @@
+// A concrete list-based MiniMap which is not optimized for any fast
+// operations. The internal key list is not kept in sorted order so
+// indexOf() must scan using linear search.  put(key,value) may simply
+// add new entries to the end of the lists so long as the give key is
+// not already present.
+public class SimpleListMM<K,V> extends AbstractListMM<K,V>{
+
+  // No special parameters required
+  public SimpleListMM();
+
+  // Scan through the list of keys linearly searching for the given
+  // key. If not present, return a negative number.
+  //
+  // TARGET COMPLEXITY: O(N)
+  // N: Number of key/value associations
+  public int indexOf(K key);
+
+  // Locate the given key and replace its binding with the given
+  // value. If not present, add the key and value onto the end of
+  // their respective lists.
+  // 
+  // TARGET COMPLEXITY: O(N)
+  // N: Number of key/value associations
+  public V put(K key, V value);
+
+}

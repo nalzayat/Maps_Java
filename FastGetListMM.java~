@@ -1,0 +1,93 @@
+import java.util.*;
+
+// A concrete list-based MiniMap which is optimized for fast get(key)
+// operations. The key type must be either Comparable or a Comparator
+// must be provided when creating instances. The key list is kept in
+// sorted order (via comparable/comparator). Binary search is used on
+// the key list to locate the index of the (key,value) pair.
+public class FastGetListMM<K,V> extends AbstractListMM<K,V>{
+
+  // Comparator used to sort elements; may be null if elements are
+  // Comparable
+  public final Comparator<K> cmp;    
+
+  // Assume elements must be comparable
+  public FastGetListMM(){
+    super();
+    this.cmp = null;
+  }
+
+  // Use the given comparator to sort the keys
+  public FastGetListMM(Comparator<K> cmp){
+    this.cmp = cmp;
+  }
+
+  // Ensure that the FastGetListMM is set up properly to work with the
+  // given key; either
+  //
+  // 1. key must be an instance of Comparable OR
+  // 2. The comparator field cmp must not be null.
+  //
+  // If both are false, throw a RuntimeException.
+  public void ensureComparable(K key){
+    if((key instanceof Comparable == false) && cmp == null){
+      throw new RuntimeException();
+    }
+  }
+  
+
+  // Use binary search to locate where the given key is located.  If
+  // not present, return a negative number.  Check to make sure either
+  // a comparator was used to initialize this instance of
+  // FastGetListMM or that the keys are Comparable. During binary
+  // search, use the comparator if present and otherwise rely on the
+  // keys being comparable.
+  // 
+  // TARGET COMPLEXITY: O(log N)
+  // N: Number of key/value associations
+  @SuppressWarnings("unchecked")
+  public int indexOf(K key){
+    int index = 0;
+    ensureComparable(key);
+    
+    if(cmp == null){
+     List<Comparable<K>> temp1 = (List<Comparable<K>>) super.keys;
+     index = Collections.binarySearch(temp1, key);
+     //return index;
+     }
+    else{
+      index = Collections.binarySearch(super.keys, key, cmp);
+      //return index2;
+    }
+    return index;
+  }
+
+
+  // Locate the given key and replace its binding with the given
+  // value. If not present, add the key in sorted order into the list
+  // of keys and add the value at the same location in the list of
+  // values.  Binary search should be used to quickly locate where the
+  // key should be and replace an existing association.  If the key is
+  // not present, list elements will need to be shifted so this method
+  // will take longer.
+  // 
+  // TARGET COMPLEXITY:
+  //   O(log N) if key is already present (use binary search)
+  //   O(N)     otherwise as a key may need to be inserted and elements shifted
+  // N: Number of key/value associations
+  public V put(K key, V value){
+    int temp = indexOf(key);
+    if(temp >= 0){
+      V temp2 = super.vals.get(temp);
+      super.vals.set(temp, value);
+      return temp2;
+    }
+    else{
+      int newIndex = temp * -1;
+      super.keys.add(newIndex-1, key);
+      super.vals.add(newIndex-1, value);
+      return null;
+    }
+  }
+
+}
